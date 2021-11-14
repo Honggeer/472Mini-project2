@@ -10,9 +10,7 @@ class Game:
     AI = 3
     size = 0
     winSize = 0
-    score=[]
-    Xs=[]
-    Os=[]
+    depth=0
     #The input
     n = input("Please key in the size of the board:")
     keyboard = [n-1][n-1]
@@ -332,6 +330,115 @@ class Game:
                         recordState = self.current_state[x + i][self.size - 1 - x]
                     count = 0
         return value
+    def minimax(self,depth,useE2, max=False):
+        value=10**(self.winSize+1)
+        if max:
+            value=-10**(self.winSize+1)
+        x = None
+        y = None
+        result = self.is_end()
+        if result == 'X':
+            return (-1, x, y)
+        elif result == 'O':
+            return (1, x, y)
+        elif result == '.':
+            return (0, x, y)
+        else:
+            if depth!=0:
+              if max:
+                  return self.minimax(self,depth-1,useE2,max=False)
+              else:
+                  return self.minimax(self.depth-1,useE2,max=True)
+            else:
+                for i in range(0, 3):
+                    for j in range(0, 3):
+                        if self.current_state[i][j] == '.':
+                            if max:
+                                self.current_state[i][j] = 'O'
+                                if useE2:
+                                    (v, _, _) = self.e2()
+                                else:
+                                    (v, _, _) = self.e1()
+                                if v > value:
+                                    value = v
+                                    x = i
+                                    y = j
+                            else:
+                                self.current_state[i][j] = 'X'
+                                if useE2:
+                                    (v, _, _) = self.e2()
+                                else:
+                                    (v, _, _) = self.e1()
+                                if v < value:
+                                    value = v
+                                    x = i
+                                    y = j
+                            self.current_state[i][j] = '.'
+                retun (value,x,y)
+    def alphabeta(self,depth, useE2,alpha=-10**(self.winSize+1),beta=10**(self.winSize+1),max=False):
+        value=10**(self.winSize+1)
+        if max:
+            value = -10**(self.winSize+1)
+        x = None
+        y = None
+        result = self.is_end()
+        if result == 'X':
+            return (-10**self.winSize, x, y)
+        elif result == 'O':
+            return (10**self.winSize, x, y)
+        elif result == '.':
+            return (0, x, y)
+        else:
+            if depth!=0:
+                if max:
+                    return self.alphabeta(self,depth-1,useE2,max=False)
+                else:
+                    return self.alphabeta(self,depth-1,useE2,max=True)
+            else:
+                for i in range(0, self.size):
+                    for j in range(0, self.size):
+                        if self.current_state[i][j] == '.':
+                            if max:
+                                self.current_state[i][j] = 'O'
+                                if useE2:
+                                    (v, _, _) = self.e2();
+                                else:
+                                    (v, _, _) = self.e1();
+                                if v > value:
+                                    value = v
+                                    x = i
+                                    y = j
+                            else:
+                                self.current_state[i][j] = 'X'
+                                if useE2:
+                                    (v, _, _) = self.e2();
+                                else:
+                                    (v, _, _) = self.e1();
+                                if v < value:
+                                    value = v
+                                    x = i
+                                    y = j
+                            self.current_state[i][j] = '.'
+                            if max:
+                                if value >= beta:
+                                    return (value, x, y)
+                                if value > alpha:
+                                    alpha = value
+                            else:
+                                if value <= alpha:
+                                    return (value, x, y)
+                                if value < beta:
+                                    beta = value
+                return (value, x, y)
+
+
+
+
+
+
+
+
+
 
 
 

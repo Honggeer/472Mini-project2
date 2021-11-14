@@ -1,8 +1,8 @@
-testList=[['O','O','O','O','.'],
+testList=[['.','.','.','.','.'],
           ['O','X','X','X','X'],
-          ['O','.','X','.','.'],
-          ['.','.','X','.','.'],
-          ['.','.','.','X','.']]
+          ['.','X','.','.','.'],
+          ['.','.','.','.','.'],
+          ['.','.','.','.','.']]
 class Test:
     size=5
     winSize=5
@@ -72,7 +72,6 @@ class Test:
         elif result == ".":
             return 0
         # row
-
         for i in range(0,self.size):
             for j in range(0,self.size):
                 if(self.current_state[i][j]=='X' and recordState=='X'):
