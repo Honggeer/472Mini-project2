@@ -1,7 +1,7 @@
 0
 
 import time
-
+import random
 
 class Game:
     MINIMAX = 0
@@ -13,6 +13,26 @@ class Game:
     score=[]
     Xs=[]
     Os=[]
+    #The input
+    n = input("Please key in the size of the board:")
+    keyboard = [n-1][n-1]
+    b = input("Please key in the number of the blocs:")
+    for x in range(b):
+        i = random.randint(0, n-1)
+        j = random.radnint(0, n-1)
+        if not keyboard[i][j]:
+            --x
+        else:
+            keyboard[i][j] = "b"
+    s = input("Please key in the winning line-up size:")
+    d1 = input("Please key in the max depth of ad search of player 1:")
+    d2 = input("Please key in the max depth of ad search of player 2:")
+    t = input("Please key in the max allowed time for AI to return a move:")
+    a = input("Enter 0 to use Minimax and 1 to use Alphabeta")
+    mode = input("Please key in the play mode(H-H, H-AI, AI-H, AI-AI")
+    characters = ['A''B''C''D''E''F''G''H''I''J']
+
+
     def __init__(self, recommend=True):
 
         self.initialize_game()
@@ -107,6 +127,22 @@ class Game:
         return self.result
 
     def input_move(self):
+        if self.mode != "AI-AI":
+            while True:
+                print(F'Player {self.player_turn}, enter your move:')
+                px = input('enter the x coordinate in letters: ')
+                px.lower()
+                orderNum = ord(px) - 97
+                while (orderNum > self.n-1):
+                    px = int(input('Warning! Invalid Number please enter it agian.'))
+                    orderNum = ord(px) - 97
+                px = orderNum
+                py = int(input('enter the y coordinate: '))
+                if self.is_valid(px, py):
+                    return (px, py)
+                else:
+                    print('The move is not valid! Try again.')
+
         while True:
             print(F'Player {self.player_turn}, enter your move:')
             px = int(input('enter the x coordinate: '))
