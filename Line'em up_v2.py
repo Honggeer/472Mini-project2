@@ -65,11 +65,16 @@ class Game:
     #     print()
 
     def draw_board(self):
-        for r in self.current_state:
-            for c in r:
+        alphabet = string.ascii_uppercase
+        alphabet_list = list(alphabet)
+        alphabet_list.insert(0, " ")
+        self.current_state.insert(0, alphabet_list[:len(self.current_state)+1])
+        for r in range(len(self.current_state)):
+            if r > 0:
+                self.current_state[r].insert(0, str(r))
+            for c in self.current_state[r]:
                 print(c, end=" ")
             print()
-
 
     def is_valid(self, px, py):
         if px < 0 or px > 2 or py < 0 or py > 2:
