@@ -2,6 +2,7 @@
 
 import time
 import random
+import string
 
 class Game:
     MINIMAX = 0
@@ -68,11 +69,12 @@ class Game:
         alphabet = string.ascii_uppercase
         alphabet_list = list(alphabet)
         alphabet_list.insert(0, " ")
-        self.current_state.insert(0, alphabet_list[:len(self.current_state)+1])
-        for r in range(len(self.current_state)):
+        temp = self.current_state
+        temp.insert(0, alphabet_list[:len(temp)+1])
+        for r in range(len(temp)):
             if r > 0:
-                self.current_state[r].insert(0, str(r))
-            for c in self.current_state[r]:
+                temp[r].insert(0, str(r))
+            for c in temp[r]:
                 print(c, end=" ")
             print()
 
