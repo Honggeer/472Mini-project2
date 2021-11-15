@@ -450,18 +450,11 @@ def main():
     print("-----------------**************-----------------")
     n = input("Please key in the size of the board:")
     g = Game(recommend=True)
-    board = g.createBoard(int(n))
     g.createBoard(int(n))
-    # for r in board:
-    #     for c in r:
-    #         print(c, end=" ")
-    #     print()
-    g.draw_board()
     b = input("Please key in the number of the blocs:")
     choice = int(input("Please select the way to generate blocs (0 for random, 1 for customize)"))
     listOfBlocs = []
     if choice == 0:
-        # x = 0
         for x in range(int(b)):
             i = random.randint(0, int(n) - 1)
             j = random.randint(0, int(n) - 1)
@@ -471,45 +464,66 @@ def main():
                 g.current_state[i][j] = '*'
                 listOfBlocs.append("(" + str(i) + "," + str(j) + ")")
                 x -= 1
-            # if board[i][j] == '*':
-            #     continue
-            # else:
-            #     board[i][j] = '*'
-            #     listOfBlocs.append("(" + str(j) + "," + str(i) + ")")
-            #     x += 1
     else:
         x = 0
         while x < (int(b)):
             print("\n" + "Please key in the coordinate of block " + str(x + 1))
-            j = int(input("Please enter the column"))
-            i = int(input("Please enter the row"))
-            # if board[i-1][j-1] == '*':
-            #     print("duplicate coordinate")
-            #     continue
-            # else:
-            #     board[i-1][j-1] = '*'
-            #     listOfBlocs.append("(" + str(j-1) + "," + str(i-1) + ")")
-            #     x += 1
+            j = int(input("Please enter the column(start from 0)"))
+            if j > (int(b) - 1):
+                print("invalid input")
+                continue
+            i = int(input("Please enter the row(start from 0)"))
+            if i > (int(b) - 1):
+                print("invalid input")
+                continue
             if g.current_state[i-1][j-1] == '*':
                 print("duplicate coordinate")
                 continue
             else:
                 g.current_state[i-1][j-1] = '*'
-                listOfBlocs.append("(" + str(j-1) + "," + str(i-1) + ")")
+                listOfBlocs.append("(" + str(j) + "," + str(i) + ")")
                 x += 1
-
-    # for r in board:
-    #     for c in r:
-    #         print(c, end=" ")
-    #     print()
+    print("The game board generated is: ")
     g.draw_board()
-    print(listOfBlocs)
+    print("\n")
+    print("blocs=" + str(listOfBlocs) + "\n")
     s = input("Please key in the winning line-up size:")
-    d1 = input("Please key in the max depth of ad search of player 1:")
-    d2 = input("Please key in the max depth of ad search of player 2:")
-    t = input("Please key in the max allowed time for AI to return a move:")
-    a = input("Please choose the minimax(enter FALSE) or aplabeta(enter TRUE):")
-    mode = int(input("Please enter a number to select the play mode(1 for H-H, 2 for H-AI, 3 for AI-H, 4 forAI-AI):"))
+    mode = int(input("Please enter a number to select the play mode(1 for H-H, 2 for H-AI, 3 for AI-H, 4 for AI-AI):"))
+    if mode == 1:
+        print("\n" + "Your choice is both player_X and player_O are human")
+        d1 = 0
+        d2 = 0
+        t = 0
+        a1 = 0
+        a2 = 0
+    else:
+        if mode == 2:
+            print("\n" + "Your choice is player_X is human and player_O is AI")
+            d1 = 0
+            d2 = input("What max depth of the adversarial search do you want to set for player_O?")
+            t = input("What is the maximum allowed time(in seconds) you want to set for the game?")
+            a1 = 0
+            a2 = input("What method do you want player_O use? (return FALSE for minimax and TRUE for aplabeta)")
+            e1 = input("Do you want player_O use e1?(return TRUE or FALSE)")
+
+        else:
+            if mode == 3:
+                print("\n" + "Your choice is player_X is AI and player_O is human")
+                d1 = input("What max depth of the adversarial search do you want to set for player_X?")
+                d2 = 0
+                t = input("What is the maximum allowed time(in seconds) you want to set for the game?")
+                a1 = input("What method do you want player_X use? (return FALSE for minimax and TRUE for aplabeta)")
+                a2 = 0
+
+            else:
+                print("\n" + "Your choice is both player_X and player_O are AI")
+                d1 = input("What max depth of the adversarial search do you want to set for player_X?")
+                d2 = input("What max depth of the adversarial search do you want to set for player_O?")
+                t = input("What is the maximum allowed time(in seconds) you want to set for the game?")
+                a1 = input("What method do you want player_X use? (return FALSE for minimax and TRUE for aplabeta)")
+                a2 = input("What method do you want player_X use? (return FALSE for minimax and TRUE for aplabeta)")
+                e1 = input("Do you want player_O use e1?(return TRUE or FALSE)")
+
 
     # number = str(n) + str(b) + str(s) + str(t)
     # name = " gameTrace-" + number.replace(" ", "") + ".txt"
