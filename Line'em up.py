@@ -10,45 +10,28 @@ class Game:
     AI = 3
     size = 0
     winSize = 0
+    numOfHeuristics=0
+    currentHeuristics=0
     depth=0
-    #The input
-    n = input("Please key in the size of the board:")
-    keyboard = [n-1][n-1]
-    b = input("Please key in the number of the blocs:")
-    for x in range(b):
-        i = random.randint(0, n-1)
-        j = random.radnint(0, n-1)
-        if not keyboard[i][j]:
-            --x
-        else:
-            keyboard[i][j] = "b"
-    s = input("Please key in the winning line-up size:")
-    d1 = input("Please key in the max depth of ad search of player 1:")
-    d2 = input("Please key in the max depth of ad search of player 2:")
-    t = input("Please key in the max allowed time for AI to return a move:")
-    a = input("Enter 0 to use Minimax and 1 to use Alphabeta")
-    mode = input("Please key in the play mode(H-H, H-AI, AI-H, AI-AI")
-    characters = ['A''B''C''D''E''F''G''H''I''J']
-
 
     def __init__(self, recommend=True):
 
         self.initialize_game()
         self.recommend = recommend
 
-    def initialize_game(self):
-        self.current_state = [['.', '.', '.'],
-                              ['.', '.', '.'],
-                              ['.', '.', '.']]
-        # Player X always plays first
-        self.player_turn = 'X'
+
 
     def initialize_game(self):
-        self.current_state = [['.', '.', '.'],
-                              ['.', '.', '.'],
-                              ['.', '.', '.']]
+        self.current_state = []
         # Player X always plays first
         self.player_turn = 'X'
+    def createBoard(self, n):
+        for i in range(0,n):
+            list=[]
+            for j in range(0,n):
+               list.append('.')
+            self.current_state.append(list)
+
 
     def draw_board(self):
         print()
@@ -125,30 +108,21 @@ class Game:
         return self.result
 
     def input_move(self):
-        if self.mode != "AI-AI":
-            while True:
-                print(F'Player {self.player_turn}, enter your move:')
-                px = input('enter the x coordinate in letters: ')
-                px.lower()
-                orderNum = ord(px) - 97
-                while (orderNum > self.n-1):
-                    px = int(input('Warning! Invalid Number please enter it agian.'))
-                    orderNum = ord(px) - 97
-                px = orderNum
-                py = int(input('enter the y coordinate: '))
-                if self.is_valid(px, py):
-                    return (px, py)
-                else:
-                    print('The move is not valid! Try again.')
-
         while True:
             print(F'Player {self.player_turn}, enter your move:')
-            px = int(input('enter the x coordinate: '))
+            px = input('enter the x coordinate in letters: ')
+            px.lower()
+            orderNum = ord(px) - 97
+            while (orderNum > self.n - 1):
+                px = int(input('Warning! Invalid Number please enter it agian.'))
+                orderNum = ord(px) - 97
+            px = orderNum
             py = int(input('enter the y coordinate: '))
             if self.is_valid(px, py):
                 return (px, py)
             else:
                 print('The move is not valid! Try again.')
+
 
     def switch_player(self):
         if self.player_turn == 'X':
@@ -158,6 +132,7 @@ class Game:
         return self.player_turn
 
     def e1(self):
+        self.numOfHeuristics+=1
         value = 0
         result = self.is_end()
         if result == "X":
@@ -187,6 +162,7 @@ class Game:
         return value
 
     def e2(self):
+        self.numOfHeuristics += 1
         value = 0
         x = None
         y = None
@@ -330,7 +306,9 @@ class Game:
                         recordState = self.current_state[x + i][self.size - 1 - x]
                     count = 0
         return value
-    def minimax(self,depth,useE2, max=False):
+    def minimax(self,depth,useE2,time, max=False):
+        self.depth+=1
+        startTime=time.time()
         value=10**(self.winSize+1)
         if max:
             value=-10**(self.winSize+1)
@@ -338,20 +316,24 @@ class Game:
         y = None
         result = self.is_end()
         if result == 'X':
-            return (-1, x, y)
+            return (-1, x, y,self.depth)
         elif result == 'O':
-            return (1, x, y)
+            return (1, x, y,self.depth)
         elif result == '.':
-            return (0, x, y)
+            return (0, x, y,self.depth)
+
         else:
-            if depth!=0:
+            endtime=time.time()
+            timeduration=endtime-startTime
+            timeleft=time-timeduration
+            if depth!=0 and timeleft>0:
               if max:
-                  return self.minimax(self,depth-1,useE2,max=False)
+                  return self.minimax(self,depth-1,useE2,timeleft,max=False)
               else:
-                  return self.minimax(self.depth-1,useE2,max=True)
+                  return self.minimax(self.depth-1,useE2,timeleft,max=True)
             else:
-                for i in range(0, 3):
-                    for j in range(0, 3):
+                for i in range(0, self.size):
+                    for j in range(0, self.size):
                         if self.current_state[i][j] == '.':
                             if max:
                                 self.current_state[i][j] = 'O'
@@ -374,8 +356,10 @@ class Game:
                                     x = i
                                     y = j
                             self.current_state[i][j] = '.'
-                retun (value,x,y)
-    def alphabeta(self,depth, useE2,alpha=-10**(self.winSize+1),beta=10**(self.winSize+1),max=False):
+                return (value,x,y,self.depth)
+    def alphabeta(self,depth, useE2,time,alpha=-1000000,beta=1000000,max=False):
+        self.depth+=1
+        startTime=time.time()
         value=10**(self.winSize+1)
         if max:
             value = -10**(self.winSize+1)
@@ -383,17 +367,20 @@ class Game:
         y = None
         result = self.is_end()
         if result == 'X':
-            return (-10**self.winSize, x, y)
+            return (-10**self.winSize, x, y,self.depth)
         elif result == 'O':
-            return (10**self.winSize, x, y)
+            return (10**self.winSize, x, y,self.depth)
         elif result == '.':
-            return (0, x, y)
+            return (0, x, y,self.depth)
         else:
-            if depth!=0:
+            endTime=time.time()
+            timeduration=endTime-startTime
+            timeLeft=time-timeduration
+            if depth!=0 and timeLeft>0:
                 if max:
-                    return self.alphabeta(self,depth-1,useE2,max=False)
+                    return self.alphabeta(self,depth-1,useE2,timeLeft,max=False)
                 else:
-                    return self.alphabeta(self,depth-1,useE2,max=True)
+                    return self.alphabeta(self,depth-1,useE2,timeLeft,max=True)
             else:
                 for i in range(0, self.size):
                     for j in range(0, self.size):
@@ -429,7 +416,60 @@ class Game:
                                     return (value, x, y)
                                 if value < beta:
                                     beta = value
-                return (value, x, y)
+                return (value, x, y,self.depth)
+    def play(self, player_o,player_x,depth_O,depth_X,timeLimit,useE2,algo_X,algo_O):
+        if algo == None:
+            algo = self.ALPHABETA
+        if player_x == None:
+            player_x = self.HUMAN
+        if player_o == None:
+            player_o = self.HUMAN
+        while True:
+            self.draw_board()
+            self.numOfHeuristics=0
+            if self.check_end():
+                return
+            if (self.player_turn == 'X' and player_x == self.HUMAN) or (self.player_turn == 'O' and player_o == self.HUMAN):
+                (x, y) = self.input_move()
+                print("Player", self.player_turn,"under human control plays:", x, y)
+            else:
+                start=time.time()
+                if self.player_turn=='X':
+                    if algo_X==self.MINIMAX:
+                        (v, x, y) = self.minimax(depth_X, useE2, timeLimit, max=False)
+                    else:
+                        (v, x, y) = self.alphabeta(depth_X, useE2, timeLimit, max=False)
+                else:
+                    if algo_O == self.MINIMAX:
+                        (v, x, y) = self.minimax(depth_O, useE2, timeLimit, max=True)
+                    else:
+                        (v, x, y) = self.alphabeta(depth_O, useE2, timeLimit, max=True)
+                # if algo==self.MINIMAX:
+                #     if self.player_turn == 'X':
+                #         (v, x, y) = self.minimax(depth_X,useE2,timeLimit,max=False)
+                #     else:
+                #         (v, x, y) = self.minimax(depth_O,useE2,timeLimit,max=True)
+                # else:
+                #     if self.player_turn == 'X':
+                #         (v, x, y) = self.alphabeta(depth, useE2,timeLimit,max=False)
+                #     else:
+                #         (v, x, y) = self.alphabeta(depth, useE2,timeLimit,max=True)
+                print("Player", self.player_turn,"under AI control plays:", x, y)
+                print()
+                end=time.time()
+                evaluationTime=round(end - start, 7)
+                print("(i)\tEvaluation time:", evaluationTime)
+                print("(ii)\tHeuristic evaluations:", v)
+
+
+
+
+
+
+
+
+
+
 
 
 
