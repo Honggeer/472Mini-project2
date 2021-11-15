@@ -353,37 +353,39 @@ class Game:
                             if depth!=0 and timeleft>0:
                                 self.depth += 1
                                 (v, _, _) = self.minimax( depth - 1, useE2, timeleft, max=False)
-                                if v > value:
-                                    value = v
-                                    x = i
-                                    y = j
+
                             else:
                                 self.depthList.append(self.depth)
                                 if timeleft <= 0:
                                     print("*** Out of extra time at depth of", self.depth, "***")
                                 else:
                                     if useE2:
-                                        return self.e2()
+                                        (v, _, _)= self.e2()
                                     else:
-                                        return self.e1()
+                                        (v, _, _) = self.e1()
+                            if v > value:
+                                value = v
+                                x = i
+                                y = j
                         else:
                             self.current_state[i][j] = 'X'
                             if depth != 0 and timeleft > 0:
                                 self.depth += 1
                                 (v, _, _) = self.minimax( depth - 1, useE2, timeleft,max=True)
-                                if v < value:
-                                    value = v
-                                    x = i
-                                    y = j
+
                             else:
                                 self.depthList.append(self.depth)
                                 if timeleft <= 0:
                                     print("*** Out of extra time at depth of", self.depth, "***")
                                 else:
                                     if useE2:
-                                        return self.e2()
+                                        (v, _, _)= self.e2()
                                     else:
-                                        return self.e1()
+                                        (v, _, _) = self.e1()
+                            if v < value:
+                                value = v
+                                x = i
+                                y = j
                         self.current_state[i][j] = '.'
             self.heuristicList.append(self.numOfStates)
             return (value,x,y)
@@ -416,37 +418,37 @@ class Game:
                             if depth!=0 and timeleft>0:
                                 self.depth += 1
                                 (v, _, _) = self.alphabeta(depth - 1, useE2, timeleft,alpha,beta, max=False)
-                                if v > value:
-                                    value = v
-                                    x = i
-                                    y = j
                             else:
                                 self.depthList.append(self.depth)
                                 if timeleft <= 0:
                                     print("*** Out of extra time at depth of", self.depth, "***")
                                 else:
                                     if useE2:
-                                        return self.e2()
+                                        (v, _, _)= self.e2()
                                     else:
-                                        return self.e1()
+                                        (v, _, _)= self.e1()
+                            if v > value:
+                                value = v
+                                x = i
+                                y = j
                         else:
                             self.current_state[i][j] = 'X'
                             if depth!=0 and timeleft>0:
                                 self.depth += 1
                                 (v, _, _) = self.alphabeta(depth - 1, useE2, timeleft, alpha,beta,max=False)
-                                if v < value:
-                                    value = v
-                                    x = i
-                                    y = j
                             else:
                                 self.depthList.append(self.depth)
                                 if timeleft <= 0:
                                     print("*** Out of extra time at depth of", self.depth, "***")
                                 else:
                                     if useE2:
-                                        return self.e2()
+                                        (v, _, _)= self.e2()
                                     else:
-                                        return self.e1()
+                                        (v, _, _)= self.e1()
+                            if v < value:
+                                value = v
+                                x = i
+                                y = j
                         self.current_state[i][j] = '.'
                         if max:
                             if value >= beta:
@@ -528,6 +530,7 @@ class Game:
                 print("(iv)\tAverage evaluation depth:", sumOfDepths/len(self.depthList))
                 totaldepths+=sumOfDepths/len(self.depthList)
                 print("(v)\tAverage recursion depth:")
+
 
 
 
