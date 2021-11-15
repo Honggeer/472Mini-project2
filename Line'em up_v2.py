@@ -461,8 +461,8 @@ def main():
     choice = int(input("Please select the way to generate blocs (0 for random, 1 for customize)"))
     listOfBlocs = []
     if choice == 0:
-        x = 0
-        while x < (int(b)):
+        # x = 0
+        for x in range(int(b)):
             i = random.randint(0, int(n) - 1)
             j = random.randint(0, int(n) - 1)
             if g.current_state[i][j] == '*':
