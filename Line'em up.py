@@ -10,10 +10,13 @@ class Game:
     AI = 3
     size = 0
     winSize = 0
-    numOfHeuristics=0
-    currentHeuristics=0
     depth=0
-
+    depthList=[]
+    heuristicList=[]
+    numOfStates=0
+    totalTime=0
+    totalStates=0
+    heuristicsTimes=0
     def __init__(self, recommend=True):
 
         self.initialize_game()
@@ -106,6 +109,12 @@ class Game:
                 print("It's a tie.")
             self.initialize_game()
         return self.result
+    def AI_move(self, x, y):
+        if self.current_state[x][y]=='.':
+            self.current_state[x][y]==self.player_turn
+        else:
+            self.switch_player()
+            self.result=self.player_turn
 
     def input_move(self):
         while True:
@@ -132,6 +141,8 @@ class Game:
         return self.player_turn
 
     def e1(self):
+        self.heuristicsTimes+=1
+        start=time.time
         self.numOfHeuristics+=1
         value = 0
         result = self.is_end()
@@ -159,9 +170,13 @@ class Game:
                 elif self.current_state[j][i] == 'O':
                     numOfO += 1
             value += (numOfO - numOfX)
+        end=time.time()
+        self.totalTime+=round(end - start, 7)
         return value
 
     def e2(self):
+        self.heuristicsTimes += 1
+        start=time.time()
         self.numOfHeuristics += 1
         value = 0
         x = None
@@ -305,9 +320,11 @@ class Game:
                     else:
                         recordState = self.current_state[x + i][self.size - 1 - x]
                     count = 0
+        end = time.time()
+        self.totalTime += round(end - start, 7)
         return value
     def minimax(self,depth,useE2,time, max=False):
-        self.depth+=1
+
         startTime=time.time()
         value=10**(self.winSize+1)
         if max:
@@ -316,50 +333,64 @@ class Game:
         y = None
         result = self.is_end()
         if result == 'X':
-            return (-1, x, y,self.depth)
+            return (-1, x, y)
         elif result == 'O':
-            return (1, x, y,self.depth)
+            return (1, x, y)
         elif result == '.':
-            return (0, x, y,self.depth)
+            return (0, x, y)
 
         else:
             endtime=time.time()
             timeduration=endtime-startTime
             timeleft=time-timeduration
-            if depth!=0 and timeleft>0:
-              if max:
-                  return self.minimax(self,depth-1,useE2,timeleft,max=False)
-              else:
-                  return self.minimax(self.depth-1,useE2,timeleft,max=True)
-            else:
-                for i in range(0, self.size):
-                    for j in range(0, self.size):
-                        if self.current_state[i][j] == '.':
-                            if max:
-                                self.current_state[i][j] = 'O'
-                                if useE2:
-                                    (v, _, _) = self.e2()
-                                else:
-                                    (v, _, _) = self.e1()
+
+            for i in range(0, self.size):
+                for j in range(0, self.size):
+                    if self.current_state[i][j] == '.':
+                        self.numOfStates+=1
+                        if max:
+                            self.current_state[i][j] = 'O'
+                            if depth!=0 and timeleft>0:
+                                self.depth += 1
+                                (v, _, _) = self.minimax( depth - 1, useE2, timeleft, max=False)
                                 if v > value:
                                     value = v
                                     x = i
                                     y = j
                             else:
-                                self.current_state[i][j] = 'X'
-                                if useE2:
-                                    (v, _, _) = self.e2()
+                                self.depthList.append(self.depth)
+                                if timeleft <= 0:
+                                    print("*** Out of extra time at depth of", self.depth, "***")
                                 else:
-                                    (v, _, _) = self.e1()
+                                    if useE2:
+                                        return self.e2()
+                                    else:
+                                        return self.e1()
+                        else:
+                            self.current_state[i][j] = 'X'
+                            if depth != 0 and timeleft > 0:
+                                self.depth += 1
+                                (v, _, _) = self.minimax( depth - 1, useE2, timeleft,max=True)
                                 if v < value:
                                     value = v
                                     x = i
                                     y = j
-                            self.current_state[i][j] = '.'
-                return (value,x,y,self.depth)
+                            else:
+                                self.depthList.append(self.depth)
+                                if timeleft <= 0:
+                                    print("*** Out of extra time at depth of", self.depth, "***")
+                                else:
+                                    if useE2:
+                                        return self.e2()
+                                    else:
+                                        return self.e1()
+                        self.current_state[i][j] = '.'
+            self.heuristicList.append(self.numOfStates)
+            return (value,x,y)
     def alphabeta(self,depth, useE2,time,alpha=-1000000,beta=1000000,max=False):
-        self.depth+=1
+
         startTime=time.time()
+
         value=10**(self.winSize+1)
         if max:
             value = -10**(self.winSize+1)
@@ -367,57 +398,72 @@ class Game:
         y = None
         result = self.is_end()
         if result == 'X':
-            return (-10**self.winSize, x, y,self.depth)
+            return (-10**self.winSize, x, y)
         elif result == 'O':
-            return (10**self.winSize, x, y,self.depth)
+            return (10**self.winSize, x, y)
         elif result == '.':
-            return (0, x, y,self.depth)
+            return (0, x, y)
         else:
             endTime=time.time()
             timeduration=endTime-startTime
-            timeLeft=time-timeduration
-            if depth!=0 and timeLeft>0:
-                if max:
-                    return self.alphabeta(self,depth-1,useE2,timeLeft,max=False)
-                else:
-                    return self.alphabeta(self,depth-1,useE2,timeLeft,max=True)
-            else:
-                for i in range(0, self.size):
-                    for j in range(0, self.size):
-                        if self.current_state[i][j] == '.':
-                            if max:
-                                self.current_state[i][j] = 'O'
-                                if useE2:
-                                    (v, _, _) = self.e2();
-                                else:
-                                    (v, _, _) = self.e1();
+            timeleft=time-timeduration
+            for i in range(0, self.size):
+                for j in range(0, self.size):
+                    if self.current_state[i][j] == '.':
+                        self.numOfStates += 1
+                        if max:
+                            self.current_state[i][j] = 'O'
+                            if depth!=0 and timeleft>0:
+                                self.depth += 1
+                                (v, _, _) = self.alphabeta(depth - 1, useE2, timeleft,alpha,beta, max=False)
                                 if v > value:
                                     value = v
                                     x = i
                                     y = j
                             else:
-                                self.current_state[i][j] = 'X'
-                                if useE2:
-                                    (v, _, _) = self.e2();
+                                self.depthList.append(self.depth)
+                                if timeleft <= 0:
+                                    print("*** Out of extra time at depth of", self.depth, "***")
                                 else:
-                                    (v, _, _) = self.e1();
+                                    if useE2:
+                                        return self.e2()
+                                    else:
+                                        return self.e1()
+                        else:
+                            self.current_state[i][j] = 'X'
+                            if depth!=0 and timeleft>0:
+                                self.depth += 1
+                                (v, _, _) = self.alphabeta(depth - 1, useE2, timeleft, alpha,beta,max=False)
                                 if v < value:
                                     value = v
                                     x = i
                                     y = j
-                            self.current_state[i][j] = '.'
-                            if max:
-                                if value >= beta:
-                                    return (value, x, y)
-                                if value > alpha:
-                                    alpha = value
                             else:
-                                if value <= alpha:
-                                    return (value, x, y)
-                                if value < beta:
-                                    beta = value
-                return (value, x, y,self.depth)
-    def play(self, player_o,player_x,depth_O,depth_X,timeLimit,useE2,algo_X,algo_O):
+                                self.depthList.append(self.depth)
+                                if timeleft <= 0:
+                                    print("*** Out of extra time at depth of", self.depth, "***")
+                                else:
+                                    if useE2:
+                                        return self.e2()
+                                    else:
+                                        return self.e1()
+                        self.current_state[i][j] = '.'
+                        if max:
+                            if value >= beta:
+                                return (value, x, y)
+                            if value > alpha:
+                                alpha = value
+                        else:
+                            if value <= alpha:
+                                return (value, x, y)
+                            if value < beta:
+                                beta = value
+            self.heuristicList.append(self.numOfStates)
+            return( value,x,y)
+
+    def play(self, player_o,player_x,depth_O,depth_X,timeLimit,useE2_X,useE2_O,algo_X,algo_O):
+        steps=0
+        totaldepths=0
         if algo == None:
             algo = self.ALPHABETA
         if player_x == None:
@@ -426,24 +472,37 @@ class Game:
             player_o = self.HUMAN
         while True:
             self.draw_board()
-            self.numOfHeuristics=0
+
             if self.check_end():
+                print("6(b)i\tAverage evaluation time:", self.totalTime/self.heuristicsTimes)
+                print("6(b)ii\tTotal heuristic evaluations:",self.heuristicsTimes)
+                print("6(b)iii\tEvaluations by depth:")
+                print("6(b)iv\tAverage evaluation depth:",totaldepths/steps)
+                print("6(b)v\tAverage recursion depth:")
+                print("6(b)vi\tTotal moves:",steps)
                 return
+            steps+=1
             if (self.player_turn == 'X' and player_x == self.HUMAN) or (self.player_turn == 'O' and player_o == self.HUMAN):
                 (x, y) = self.input_move()
                 print("Player", self.player_turn,"under human control plays:", x, y)
             else:
+                heuristicEvaluation=0
+                sumOfDepths=0
+                self.heuristicList=[]
+                self.depthList=[]
+                self.depth=0
+                self.numOfStates=0
                 start=time.time()
                 if self.player_turn=='X':
                     if algo_X==self.MINIMAX:
-                        (v, x, y) = self.minimax(depth_X, useE2, timeLimit, max=False)
+                        (v, x, y) = self.minimax(depth_X, useE2_X, timeLimit, max=False)
                     else:
-                        (v, x, y) = self.alphabeta(depth_X, useE2, timeLimit, max=False)
+                        (v, x, y) = self.alphabeta(depth_X, useE2_X, timeLimit, max=False)
                 else:
                     if algo_O == self.MINIMAX:
-                        (v, x, y) = self.minimax(depth_O, useE2, timeLimit, max=True)
+                        (v, x, y) = self.minimax(depth_O, useE2_O, timeLimit, max=True)
                     else:
-                        (v, x, y) = self.alphabeta(depth_O, useE2, timeLimit, max=True)
+                        (v, x, y) = self.alphabeta(depth_O, useE2_O, timeLimit, max=True)
                 # if algo==self.MINIMAX:
                 #     if self.player_turn == 'X':
                 #         (v, x, y) = self.minimax(depth_X,useE2,timeLimit,max=False)
@@ -454,12 +513,24 @@ class Game:
                 #         (v, x, y) = self.alphabeta(depth, useE2,timeLimit,max=False)
                 #     else:
                 #         (v, x, y) = self.alphabeta(depth, useE2,timeLimit,max=True)
+                self.AI_move(x,y)
                 print("Player", self.player_turn,"under AI control plays:", x, y)
                 print()
                 end=time.time()
                 evaluationTime=round(end - start, 7)
+                for i in self.heuristicList:
+                    heuristicEvaluation+=i
+                for i in self.depthList:
+                    sumOfDepths+=i
                 print("(i)\tEvaluation time:", evaluationTime)
-                print("(ii)\tHeuristic evaluations:", v)
+                print("(ii)\tHeuristic evaluations:", heuristicEvaluation)
+                print("(iii)\tEvaluations by depth:")
+                print("(iv)\tAverage evaluation depth:", sumOfDepths/len(self.depthList))
+                totaldepths+=sumOfDepths/len(self.depthList)
+                print("(v)\tAverage recursion depth:")
+
+
+
 
 
 
