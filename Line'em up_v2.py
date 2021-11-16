@@ -3,6 +3,7 @@
 import time
 import random
 import string
+import copy
 
 class Game:
     MINIMAX = 0
@@ -66,10 +67,11 @@ class Game:
     #     print()
 
     def draw_board(self):
+        print(self.current_state)
         alphabet = string.ascii_uppercase
         alphabet_list = list(alphabet)
         alphabet_list.insert(0, " ")
-        temp = self.current_state
+        temp = copy.deepcopy(self.current_state)
         temp.insert(0, alphabet_list[:len(temp)+1])
         for r in range(len(temp)):
             if r > 0:
@@ -458,6 +460,8 @@ def main():
     n = input("Please key in the size of the board:")
     g = Game(recommend=True)
     g.createBoard(int(n))
+    g.draw_board()
+    g.draw_board()
     b = input("Please key in the number of the blocs:")
     choice = int(input("Please select the way to generate blocs (0 for random, 1 for customize)"))
     listOfBlocs = []
@@ -492,8 +496,10 @@ def main():
                 x += 1
     print("The game board generated is: ")
     g.draw_board()
+
     print("\n")
     print("blocs=" + str(listOfBlocs) + "\n")
+
     s = input("Please key in the winning line-up size:")
     mode = int(input("Please enter a number to select the play mode(1 for H-H, 2 for H-AI, 3 for AI-H, 4 for AI-AI):"))
     if mode == 1:
