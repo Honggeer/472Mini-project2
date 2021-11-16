@@ -53,8 +53,8 @@ class Game:
             return True
 
     def is_end(self):
-        for i in range(0, self.size):
-            for j in range(0, self.size):
+        for i in range(0, self.size-1):
+            for j in range(0, self.size-1):
                 # win in rows
                 if self.current_state[i][j] == "*" or self.current_state[i][j] == ".":
                     continue
@@ -148,7 +148,7 @@ class Game:
 
     def e1(self):
         self.heuristicsTimes+=1
-        start=time.time
+        start=time.time()
         value = 0
         result = self.is_end()
         if result == "X":
@@ -176,7 +176,7 @@ class Game:
                     numOfO += 1
             value += (numOfO - numOfX)
         end=time.time()
-        self.totalTime+=round(end - start, 7)
+        self.totalTime += round(end - start, 7)
         return value
 
     def e2(self):
