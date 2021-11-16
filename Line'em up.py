@@ -234,11 +234,13 @@ class Game:
                         value -= 10 ** count
                         if self.current_state[j][i]=='O' or self.current_state[j][i]=='*':
                             value+= 10 ** count
+
                         recordState = self.current_state[j][i]
                     elif recordState == 'O' and (self.current_state[j][i] != recordState or j == self.size - 1):
                         value += 10 ** count
                         if self.current_state[j][i]=='X' or self.current_state[j][i]=='*':
                             value-= 10 ** count
+
                         recordState = self.current_state[j][i]
                     else:
                         recordState = self.current_state[j][i]
@@ -260,11 +262,13 @@ class Game:
                         value -= 10 ** count
                         if self.current_state[x][i + x]=='O' or self.current_state[x][i + x]=='*':
                             value+= 10 ** count
+
                         recordState = self.current_state[x][i + x]
                     elif recordState == 'O' and (self.current_state[x][i + x] != recordState or x == self.size - i - 1):
                         value += 10 ** count
                         if self.current_state[x][i + x]=='X' or self.current_state[x][i + x]=='*':
                             value-= 10 ** count
+
                         recordState = self.current_state[x][i + x]
                     else:
                         recordState = self.current_state[x][i + x]
@@ -285,11 +289,13 @@ class Game:
                         value -= 10 ** count
                         if self.current_state[i + x][x]=='O' or self.current_state[i + x][x]=='*':
                             value+= 10 ** count
+
                         recordState = self.current_state[i + x][x]
                     elif recordState == 'O' and (self.current_state[i + x][x] != recordState or x == self.size - i - 1):
                         value += 10 ** count
                         if  self.current_state[i + x][x]=='X' or self.current_state[i + x][x]=='*':
                             value-= 10 ** count
+
                         recordState = self.current_state[i + x][x]
                     else:
                         recordState = self.current_state[i + x][x]
@@ -312,11 +318,13 @@ class Game:
                         value -= 10 ** count
                         if self.current_state[i - x][x]=='O' or self.current_state[i - x][x]=='*':
                             value+= 10 ** count
+
                         recordState = self.current_state[i - x][x]
                     elif recordState == 'O' and (self.current_state[i - x][x] != recordState or x == i):
                         value += 10 ** count
                         if self.current_state[i - x][x]=='X' or self.current_state[i - x][x]=='*':
                             value-= 10 ** count
+
                         recordState = self.current_state[i - x][x]
                     else:
                         recordState = self.current_state[i - x][x]
@@ -337,11 +345,13 @@ class Game:
                         value -= 10 ** count
                         if self.current_state[x + i][self.size - 1 - x]=='O' or self.current_state[x + i][self.size - 1 - x]=='*':
                             value+= 10 ** count
+
                         recordState = self.current_state[x + i][self.size - 1 - x]
                     elif recordState == 'O' and (self.current_state[x + i][self.size - 1 - x] != recordState or x == i):
                         value += 10 ** count
                         if self.current_state[x + i][self.size - 1 - x]=='X' or self.current_state[x + i][self.size - 1 - x]=='*':
                             value-= 10 ** count
+
                         recordState = self.current_state[x + i][self.size - 1 - x]
                     else:
                         recordState = self.current_state[x + i][self.size - 1 - x]
@@ -367,24 +377,35 @@ class Game:
                     self.numOfStates += 1
                     if max:
                         self.current_state[i][j] = 'O'
-                        if depth != 0 and timeleft > 0:
-                            self.depth += 1
-                            (v, _, _) = self.minimax(depth - 1, useE2, timeleft, max=False)
-
-                        else:
+                        result = self.is_end()
+                        if result == "O":
+                            v=200**self.winSize
+                            x=i
+                            y=j
+                            self.current_state[i][j] = '.'
                             self.depthList.append(self.depth)
-                            if timeleft <= 0:
-                                print("*** Out of extra time at depth of", self.depth, "***")
-                                x = random.randint(0, self.size - 1)
-                                y = random.randint(0, self.size - 1)
-                                print("Selected random move for O:", x, y)
-                                return (value, x, y)
-                            else:
+                            self.heuristicList.append(self.numOfStates)
+                            self.depth = 0
+                            return(v,x ,y)
+                        else:
+                            if depth != 0 and timeleft > 0:
+                                self.depth += 1
+                                (v, _, _) = self.minimax(depth - 1, useE2, timeleft, max=False)
 
-                                if useE2:
-                                    v = self.e2()
+                            else:
+                                self.depthList.append(self.depth)
+                                if timeleft <= 0:
+                                    print("*** Out of extra time at depth of", self.depth, "***")
+                                    x = random.randint(0, self.size - 1)
+                                    y = random.randint(0, self.size - 1)
+                                    print("Selected random move for O:", x, y)
+                                    return (value, x, y)
                                 else:
-                                    v = self.e1()
+
+                                    if useE2:
+                                        v = self.e2()
+                                    else:
+                                        v = self.e1()
                         if v > value:
                             value = v
                             x = i
@@ -393,24 +414,36 @@ class Game:
 
                     else:
                         self.current_state[i][j] = 'X'
-                        if depth != 0 and timeleft > 0:
-                            self.depth += 1
-                            (v, _, _) = self.minimax(depth - 1, useE2, timeleft, max=True)
+                        result = self.is_end()
+                        if result == "X":
+                            v=-200**self.winSize
+                            x=i
+                            y=j
+                            self.depthList.append(self.depth)
+                            self.heuristicList.append(self.numOfStates)
+                            self.current_state[i][j] = '.'
+                            self.depth = 0
+                            return (v,x,y)
 
                         else:
-                            self.depthList.append(self.depth)
-                            if timeleft <= 0 and depth!=0:
-                                print("*** Out of extra time at depth of", self.depth, "***")
-                                x = random.randint(0, self.size - 1)
-                                y = random.randint(0, self.size - 1)
-                                print("Selected random move for X:", x, y)
-                                return (value, x, y)
-                            else:
-                                if useE2:
-                                    v = self.e2()
+                            if depth != 0 and timeleft > 0:
+                                self.depth += 1
+                                (v, _, _) = self.minimax(depth - 1, useE2, timeleft, max=True)
 
+                            else:
+                                self.depthList.append(self.depth)
+                                if timeleft <= 0 and depth != 0:
+                                    print("*** Out of extra time at depth of", self.depth, "***")
+                                    x = random.randint(0, self.size - 1)
+                                    y = random.randint(0, self.size - 1)
+                                    print("Selected random move for X:", x, y)
+                                    return (value, x, y)
                                 else:
-                                    v = self.e1()
+                                    if useE2:
+                                        v = self.e2()
+
+                                    else:
+                                        v = self.e1()
 
                         if v < value:
                             value = v
@@ -434,53 +467,78 @@ class Game:
         endTime = time.time()
         timeduration = endTime - startTime
         timeleft = timelimit - timeduration
+
         for i in range(0, self.size):
             for j in range(0, self.size):
                 if self.current_state[i][j] == '.':
                     self.numOfStates += 1
+
                     if max:
                         self.current_state[i][j] = 'O'
-                        if depth != 0 and timeleft > 0:
-                            self.depth += 1
-                            (v, _, _) = self.alphabeta(depth - 1, useE2, timeleft, alpha, beta, max=False)
-                        else:
-
+                        result = self.is_end()
+                        if result == "O":
+                            v = 200 ** self.winSize
+                            x = i
+                            y = j
+                            self.current_state[i][j] = '.'
                             self.depthList.append(self.depth)
-                            if timeleft <= 0:
-                                print("*** Out of extra time at depth of", self.depth, "***")
-                                x = random.randint(0, self.size - 1)
-                                y = random.randint(0, self.size - 1)
-                                print("Selected random move for O:", x, y)
-                                return (value, x, y)
+                            self.heuristicList.append(self.numOfStates)
+                            self.depth = 0
+                            return (v,x,y)
+                        else:
+                            if depth != 0 and timeleft > 0:
+                                self.depth += 1
+                                (v, x, y) = self.alphabeta(depth - 1, useE2, timeleft, alpha, beta, max=False)
                             else:
 
-                                if useE2:
-                                    v = self.e2()
+                                self.depthList.append(self.depth)
+                                if timeleft <= 0:
+                                    print("*** Out of extra time at depth of", self.depth, "***")
+                                    x = random.randint(0, self.size - 1)
+                                    y = random.randint(0, self.size - 1)
+                                    print("Selected random move for O:", x, y)
+                                    return (value, x, y)
                                 else:
-                                    v = self.e1()
+
+                                    if useE2:
+                                        v = self.e2()
+                                    else:
+                                        v = self.e1()
                         if v > value:
                             value = v
                             x = i
                             y = j
                     else:
                         self.current_state[i][j] = 'X'
-                        if depth != 0 and timeleft > 0:
-                            self.depth += 1
-                            (v, _, _) = self.alphabeta(depth - 1, useE2, timeleft, alpha, beta, max=False)
-                        else:
+                        result = self.is_end()
+                        if result == "X":
+                            v = -200 ** self.winSize
+                            x = i
+                            y = j
+                            self.current_state[i][j] = '.'
                             self.depthList.append(self.depth)
-                            if timeleft <= 0:
-                                print("*** Out of extra time at depth of", self.depth, "***")
-                                x = random.randint(0, self.size - 1)
-                                y = random.randint(0, self.size - 1)
-                                print("Selected random move for X:", x, y)
-                                return (value, x, y)
-                            else:
-                                if useE2:
-                                    v = self.e2()
+                            self.heuristicList.append(self.numOfStates)
+                            self.depth=0
+                            return (v,x,y)
 
+                        else:
+                            if depth != 0 and timeleft > 0:
+                                self.depth += 1
+                                (v, x, y) = self.alphabeta(depth - 1, useE2, timeleft, alpha, beta, max=False)
+                            else:
+                                self.depthList.append(self.depth)
+                                if timeleft <= 0:
+                                    print("*** Out of extra time at depth of", self.depth, "***")
+                                    x = random.randint(0, self.size - 1)
+                                    y = random.randint(0, self.size - 1)
+                                    print("Selected random move for X:", x, y)
+                                    return (value, x, y)
                                 else:
-                                    v = self.e1()
+                                    if useE2:
+                                        v = self.e2()
+
+                                    else:
+                                        v = self.e1()
 
                         if v < value:
                             value = v
@@ -498,7 +556,9 @@ class Game:
                         if value < beta:
                             beta = value
 
+        self.depth=0
         self.heuristicList.append(self.numOfStates)
+        self.numOfStates=0
         return (value, x, y)
 
 

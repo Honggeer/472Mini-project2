@@ -256,6 +256,7 @@ class Test:
 def main():
     test=Test(recommend=True)
     print(test.e2())
+    print(-20**2)
 if __name__ == "__main__":
 	main()
 
