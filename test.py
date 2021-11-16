@@ -1,11 +1,11 @@
-testList=[['.','.','.','.','.'],
-          ['.','X','X','X','X'],
-          ['.','X','.','.','.'],
+testList=[['.','.','*','.','.'],
           ['.','.','.','.','.'],
+          ['.','*','.','.','.'],
+          ['.','.','.','*','.'],
           ['.','.','.','.','.']]
 class Test:
     size=5
-    winSize=5
+    winSize=3
     def __init__(self, recommend=True):
         self.initialize_Test()
         self.recommend = recommend
@@ -17,41 +17,51 @@ class Test:
         for i in range(0, self.size):
             for j in range(0, self.size):
                 # win in rows
+                if self.current_state[i][j]=="*" or self.current_state[i][j]==".":
+                    continue
                 if i < self.size - (self.winSize - 1):
-                    for x in range(0, self.winSize - 2 ):
+                    count=0
+                    for x in range(0, self.winSize-1 ):
                         if (self.current_state[i + x][j] != self.current_state[i + x + 1][j]):
                             break
                         else:
-                            if x == 4:
+                            count+=1
+                            if count == self.winSize-1:
                                 return self.current_state[i][j]
-                            continue
 
-                elif j < self.size - (self.winSize - 1):
-                    for x in range(0, self.winSize - 2):
+
+                if j < self.size - (self.winSize - 1):
+                    count=0
+                    for x in range(0, self.winSize - 1):
                         if (self.current_state[i][j + x] != self.current_state[i][j + x + 1]):
                             break
                         else:
-                            if x == 4:
+                            count+=1
+                            if count == self.winSize-1:
                                 return self.current_state[i][j]
-                            continue
 
-                elif i < self.size - (self.winSize - 1) and j < self.size - (self.winSize - 1):
-                    for x in range(0, self.winSize - 2):
+
+                if i < self.size - (self.winSize - 1) and j < self.size - (self.winSize - 1):
+                    count=0
+                    for x in range(0, self.winSize - 1):
                         if (self.current_state[i + x][j + x] != self.current_state[i + x + 1][j + x + 1]):
                             break
                         else:
-                            if x == 4:
+                            count+=1
+                            if count == self.winSize-1:
                                 return self.current_state[i][j]
-                            continue
 
-                elif j > self.winSize - 2 and i < self.size - (self.winSize - 1):
-                    for x in range(0, self.winSize - 2):
-                        if (self.current_state[i - x][j + x] != self.current_state[i + x - 1][j + x]):
+
+                if j > self.winSize - 2 and i < self.size - (self.winSize - 1):
+                    count=0
+                    for x in range(0, self.winSize - 1):
+                        if (self.current_state[i + x][j - x] != self.current_state[i + x + 1][j - x - 1]):
                             break
                         else:
-                            if x == 4:
+                            count+=1
+                            if count == self.winSize-1:
                                 return self.current_state[i][j]
-                            continue
+
 
         for i in range(0, self.size):
             for j in range(0, self.size):
@@ -201,9 +211,20 @@ class Test:
                         recordState = self.current_state[x+i][self.size-1-x]
                     count = 0
         return value
+    def check_end(self):
+        self.result = self.is_end()
+        if self.result != None:
+            if self.result == 'X':
+                print("The winner is X!")
+            elif self.result == 'O':
+                print("The winner is O!")
+            elif self.result == '.':
+                print("It's a tie.")
+            self.initialize_game()
+        return self.result
 def main():
     test=Test(recommend=True)
-    print(test.e2())
+    print(test.check_end())
 if __name__ == "__main__":
 	main()
 
