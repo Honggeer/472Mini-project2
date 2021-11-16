@@ -45,7 +45,7 @@ class Game:
             print()
 
     def is_valid(self, px, py):
-        if px < 0 or px > 2 or py < 0 or py > 2:
+        if px < 0 or px > self.size-1 or py < 0 or py > self.size-1:
             return False
         elif self.current_state[px][py] != '.':
             return False
@@ -116,6 +116,12 @@ class Game:
             self.initialize_game()
         return self.result
     def AI_move(self, x, y):
+        if x==None or y==None:
+            for i in range(0,self.size):
+                for j in range(0,self.size):
+                    if self.current_state[i][j]=='.':
+                        x=i
+                        y=j
         if self.current_state[x][y]=='.':
             self.current_state[x][y]=self.player_turn
         else:
@@ -126,15 +132,9 @@ class Game:
         while True:
             print(F'Player {self.player_turn}, enter your move:')
             px = input('enter the x coordinate in letters: ')
-            px.lower()
-            orderNum = ord(px) - 97
-            while (orderNum > self.n - 1):
-                px = int(input('Warning! Invalid Number please enter it agian.'))
-                orderNum = ord(px) - 97
-            px = orderNum
             py = int(input('enter the y coordinate: '))
-            if self.is_valid(px, py):
-                return (px, py)
+            if self.is_valid(int(px), int(py)):
+                return (int(px), int(py))
             else:
                 print('The move is not valid! Try again.')
 
@@ -152,9 +152,9 @@ class Game:
         value = 0
         result = self.is_end()
         if result == "X":
-            return -100 ** self.winSize
+            return -20 ** self.winSize
         elif result == "O":
-            return 100 ** self.winSize
+            return 20 ** self.winSize
         elif result == ".":
             return 0
         for i in range(0, self.size):
@@ -187,9 +187,9 @@ class Game:
         recordState = '.'
         result = self.is_end()
         if result == "X":
-            return -100 ** self.winSize
+            return -20 ** self.winSize
         elif result == "O":
-            return 100 ** self.winSize
+            return 20 ** self.winSize
         elif result == ".":
             return 0
         # row
@@ -205,9 +205,13 @@ class Game:
                 else:
                     if recordState == 'X' and (self.current_state[i][j] != recordState or j == self.size - 1):
                         value -= 10 ** count
+                        if self.current_state[i][j]=='O' or self.current_state[i][j]=='*':
+                            value+= 10 ** count
                         recordState = self.current_state[i][j]
                     elif recordState == 'O' and (self.current_state[i][j] != recordState or j == self.size - 1):
                         value += 10 ** count
+                        if self.current_state[i][j]=='X' or self.current_state[i][j]=='*':
+                            value -= 10 ** count
                         recordState = self.current_state[i][j]
                     else:
                         recordState = self.current_state[i][j]
@@ -228,9 +232,13 @@ class Game:
                 else:
                     if recordState == 'X' and (self.current_state[j][i] != recordState or j == self.size - 1):
                         value -= 10 ** count
+                        if self.current_state[j][i]=='O' or self.current_state[j][i]=='*':
+                            value+= 10 ** count
                         recordState = self.current_state[j][i]
                     elif recordState == 'O' and (self.current_state[j][i] != recordState or j == self.size - 1):
                         value += 10 ** count
+                        if self.current_state[j][i]=='X' or self.current_state[j][i]=='*':
+                            value-= 10 ** count
                         recordState = self.current_state[j][i]
                     else:
                         recordState = self.current_state[j][i]
@@ -250,9 +258,13 @@ class Game:
                 else:
                     if recordState == 'X' and (self.current_state[x][i + x] != recordState or x == self.size - i - 1):
                         value -= 10 ** count
+                        if self.current_state[x][i + x]=='O' or self.current_state[x][i + x]=='*':
+                            value+= 10 ** count
                         recordState = self.current_state[x][i + x]
                     elif recordState == 'O' and (self.current_state[x][i + x] != recordState or x == self.size - i - 1):
                         value += 10 ** count
+                        if self.current_state[x][i + x]=='X' or self.current_state[x][i + x]=='*':
+                            value-= 10 ** count
                         recordState = self.current_state[x][i + x]
                     else:
                         recordState = self.current_state[x][i + x]
@@ -271,9 +283,13 @@ class Game:
                 else:
                     if recordState == 'X' and (self.current_state[i + x][x] != recordState or x == self.size - i - 1):
                         value -= 10 ** count
+                        if self.current_state[i + x][x]=='O' or self.current_state[i + x][x]=='*':
+                            value+= 10 ** count
                         recordState = self.current_state[i + x][x]
                     elif recordState == 'O' and (self.current_state[i + x][x] != recordState or x == self.size - i - 1):
                         value += 10 ** count
+                        if  self.current_state[i + x][x]=='X' or self.current_state[i + x][x]=='*':
+                            value-= 10 ** count
                         recordState = self.current_state[i + x][x]
                     else:
                         recordState = self.current_state[i + x][x]
@@ -294,9 +310,13 @@ class Game:
                 else:
                     if recordState == 'X' and (self.current_state[i - x][x] != recordState or x == i):
                         value -= 10 ** count
+                        if self.current_state[i - x][x]=='O' or self.current_state[i - x][x]=='*':
+                            value+= 10 ** count
                         recordState = self.current_state[i - x][x]
                     elif recordState == 'O' and (self.current_state[i - x][x] != recordState or x == i):
                         value += 10 ** count
+                        if self.current_state[i - x][x]=='X' or self.current_state[i - x][x]=='*':
+                            value-= 10 ** count
                         recordState = self.current_state[i - x][x]
                     else:
                         recordState = self.current_state[i - x][x]
@@ -315,9 +335,13 @@ class Game:
                 else:
                     if recordState == 'X' and (self.current_state[x + i][self.size - 1 - x] != recordState or x == i):
                         value -= 10 ** count
+                        if self.current_state[x + i][self.size - 1 - x]=='O' or self.current_state[x + i][self.size - 1 - x]=='*':
+                            value+= 10 ** count
                         recordState = self.current_state[x + i][self.size - 1 - x]
                     elif recordState == 'O' and (self.current_state[x + i][self.size - 1 - x] != recordState or x == i):
                         value += 10 ** count
+                        if self.current_state[x + i][self.size - 1 - x]=='X' or self.current_state[x + i][self.size - 1 - x]=='*':
+                            value-= 10 ** count
                         recordState = self.current_state[x + i][self.size - 1 - x]
                     else:
                         recordState = self.current_state[x + i][self.size - 1 - x]
@@ -375,22 +399,19 @@ class Game:
 
                         else:
                             self.depthList.append(self.depth)
-                            if timeleft <= 0:
+                            if timeleft <= 0 and depth!=0:
                                 print("*** Out of extra time at depth of", self.depth, "***")
                                 x = random.randint(0, self.size - 1)
                                 y = random.randint(0, self.size - 1)
                                 print("Selected random move for X:", x, y)
                                 return (value, x, y)
                             else:
-                                print("111111111")
                                 if useE2:
                                     v = self.e2()
-                                    x=i
-                                    y=j
+
                                 else:
                                     v = self.e1()
-                                    x = i
-                                    y = j
+
                         if v < value:
                             value = v
                             x = i
@@ -423,6 +444,7 @@ class Game:
                             self.depth += 1
                             (v, _, _) = self.alphabeta(depth - 1, useE2, timeleft, alpha, beta, max=False)
                         else:
+
                             self.depthList.append(self.depth)
                             if timeleft <= 0:
                                 print("*** Out of extra time at depth of", self.depth, "***")
@@ -431,15 +453,11 @@ class Game:
                                 print("Selected random move for O:", x, y)
                                 return (value, x, y)
                             else:
-                                print("111111111")
+
                                 if useE2:
                                     v = self.e2()
-                                    x = i
-                                    y = j
                                 else:
                                     v = self.e1()
-                                    x = i
-                                    y = j
                         if v > value:
                             value = v
                             x = i
@@ -460,12 +478,10 @@ class Game:
                             else:
                                 if useE2:
                                     v = self.e2()
-                                    x=i
-                                    y=j
+
                                 else:
                                     v = self.e1()
-                                    x=i
-                                    y=j
+
                         if v < value:
                             value = v
                             x = i
@@ -512,6 +528,9 @@ class Game:
             if (self.player_turn == 'X' and player_x == self.HUMAN) or (self.player_turn == 'O' and player_o == self.HUMAN):
                 (x, y) = self.input_move()
                 print("Player", self.player_turn,"under human control plays:", x, y)
+                self.current_state[x][y]=self.player_turn
+                self.draw_board()
+                self.switch_player()
             else:
                 heuristicEvaluation=0
                 sumOfDepths=0
