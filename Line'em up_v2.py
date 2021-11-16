@@ -73,7 +73,7 @@ class Game:
         temp.insert(0, alphabet_list[:len(temp)+1])
         for r in range(len(temp)):
             if r > 0:
-                temp[r].insert(0, str(r))
+                temp[r].insert(0, str(r-1))
             for c in temp[r]:
                 print(c, end=" ")
             print()
