@@ -1,12 +1,13 @@
 import  time
-testList=[['.','.','O','.','.'],
-          ['.','X','.','O','.'],
-          ['O','X','X','X','O'],
-          ['.','X','.','*','.'],
-          ['.','O','.','.','.']]
+testList=[['.','.','.','.','.'],
+          ['.','.','.','.','.'],
+          ['.','.','X','.','.'],
+          ['.','.','.','.','.'],
+          ['.','.','.','.','.']]
 class Test:
     size=5
-    winSize=4
+    winSize=5
+    list=[1,2,3,4,5]
     def __init__(self, recommend=True):
         self.initialize_Test()
         self.recommend = recommend
@@ -74,7 +75,7 @@ class Test:
 
         start = time.time()
         value = 0
-        count = 0
+
         recordState = '.'
         result = self.is_end()
         if result == "X":
@@ -84,56 +85,72 @@ class Test:
         elif result == ".":
             return 0
         # row
-
+        count=0
         for i in range(0, self.size):
             for j in range(0, self.size):
-                if (self.current_state[i][j] == 'X' and recordState == 'X'):
+                if (self.current_state[i][j] == 'X' and recordState == 'X' ):
                     recordState = 'X'
                     count += 1
-                elif (self.current_state[i][j] == 'O' and recordState == 'O'):
+                    if j==self.size-1:
+                        recordState='.'
+                        value-=10**count
+                        count=0
+                elif (self.current_state[i][j] == 'O' and recordState == 'O' ):
                     recordState = 'O'
                     count += 1
+                    if j==self.size-1:
+                        recordState='.'
+                        value+=10**count
+                        count=0
                 else:
-                    if recordState == 'X' and (self.current_state[i][j] != recordState or j == self.size - 1):
+                    if recordState == 'X':
                         value -= 10 ** count
-                        if self.current_state[i][j] == 'O' or self.current_state[i][j] == '*':
-                            value += 10 ** count
+                        count=0
                         recordState = self.current_state[i][j]
-                    elif recordState == 'O' and (self.current_state[i][j] != recordState or j == self.size - 1):
+                    elif recordState == 'O':
                         value += 10 ** count
-                        if self.current_state[i][j] == 'X' or self.current_state[i][j] == '*':
-                            value -= 10 ** count
+                        count=0
                         recordState = self.current_state[i][j]
-                    else:
-                        recordState = self.current_state[i][j]
+                    elif recordState=='.' or recordState=='*':
 
-                    count = 0
+                        recordState=self.current_state[i][j]
+                if j==self.size-1:
+                    recordState='.'
+
 
         count = 0
         recordState = '.'
-        # column
+        #column
         for i in range(0, self.size):
             for j in range(0, self.size):
                 if (self.current_state[j][i] == 'X' and recordState == 'X'):
                     recordState = 'X'
                     count += 1
+                    if j == self.size - 1:
+                        recordState = '.'
+                        value -= 10 ** count
+                        count = 0
                 elif (self.current_state[j][i] == 'O' and recordState == 'O'):
                     recordState = 'O'
                     count += 1
-                else:
-                    if recordState == 'X' and (self.current_state[j][i] != recordState or j == self.size - 1):
-                        value -= 10 ** count
-                        if self.current_state[j][i] == 'O' or self.current_state[j][i] == '*':
-                            value += 10 ** count
-                        recordState = self.current_state[j][i]
-                    elif recordState == 'O' and (self.current_state[j][i] != recordState or j == self.size - 1):
+                    if j == self.size - 1:
+                        recordState = '.'
                         value += 10 ** count
-                        if self.current_state[j][i] == 'X' or self.current_state[j][i] == '*':
-                            value -= 10 ** count
+                        count = 0
+                else:
+                    if recordState == 'X':
+                        value -= 10 ** count
+                        count = 0
+                        recordState = self.current_state[j][i]
+                    elif recordState == 'O':
+                        value += 10 ** count
+                        count = 0
                         recordState = self.current_state[j][i]
                     else:
                         recordState = self.current_state[j][i]
-                    count = 0
+                if j==self.size-1:
+                    recordState='.'
+
         # right diagonal
         count = 0
         recordState = '.'
@@ -143,103 +160,132 @@ class Test:
                 if (self.current_state[x][i + x] == 'X' and recordState == 'X'):
                     recordState = 'X'
                     count += 1
+
+                    if x == self.size - i-1:
+                        recordState = '.'
+                        value -= 10 ** count
+                        count = 0
                 elif (self.current_state[x][i + x] == 'O' and recordState == 'O'):
                     recordState = 'O'
                     count += 1
-                else:
-                    if recordState == 'X' and (self.current_state[x][i + x] != recordState or x == self.size - i - 1):
-                        value -= 10 ** count
-                        if self.current_state[x][i + x] == 'O' or self.current_state[x][i + x] == '*':
-                            value += 10 ** count
-                        recordState = self.current_state[x][i + x]
-                    elif recordState == 'O' and (self.current_state[x][i + x] != recordState or x == self.size - i - 1):
+                    if x == self.size - i-1:
+                        recordState = '.'
                         value += 10 ** count
-                        if self.current_state[x][i + x] == 'X' or self.current_state[x][i + x] == '*':
-                            value -= 10 ** count
-                        recordState = self.current_state[x][i + x]
+                        count = 0
+                else:
+                    if recordState == 'X':
+                        value -= 10 ** count
+                        count = 0
+                        recordState = self.current_state[x][i+x]
+                    elif recordState == 'O':
+                        value += 10 ** count
+                        count = 0
+                        recordState = self.current_state[x][i+x]
                     else:
-                        recordState = self.current_state[x][i + x]
-                    count = 0
+                        recordState = self.current_state[x][i+x]
+                if x==self.size-i-1:
+                    recordState='.'
+
         count = 0
         recordState = '.'
         # lower half
-        for i in range(1, self.size):  # because 0 has already been counted in upper dialogue
+        for i in range(1, self.size):
             for x in range(0, self.size - i):
-                if (self.current_state[i + x][x] == 'X' and recordState == 'X'):
+                if (self.current_state[x+i][ x] == 'X' and recordState == 'X'):
                     recordState = 'X'
                     count += 1
-                elif (self.current_state[i + x][x] == 'O' and recordState == 'O'):
+                    if x == self.size - i - 1:
+                        recordState = '.'
+                        value -= 10 ** count
+                        count = 0
+                elif (self.current_state[x+i][x] == 'O' and recordState == 'O'):
                     recordState = 'O'
                     count += 1
-                else:
-                    if recordState == 'X' and (self.current_state[i + x][x] != recordState or x == self.size - i - 1):
-                        value -= 10 ** count
-                        if self.current_state[i + x][x] == 'O' or self.current_state[i + x][x] == '*':
-                            value += 10 ** count
-                        recordState = self.current_state[i + x][x]
-                    elif recordState == 'O' and (self.current_state[i + x][x] != recordState or x == self.size - i - 1):
+                    if x == self.size - i - 1:
+                        recordState = '.'
                         value += 10 ** count
-                        if self.current_state[i + x][x] == 'X' or self.current_state[i + x][x] == '*':
-                            value -= 10 ** count
-                        recordState = self.current_state[i + x][x]
+                        count = 0
+                else:
+                    if recordState == 'X':
+                        value -= 10 ** count
+                        count = 0
+                        recordState = self.current_state[x+i][x]
+                    elif recordState == 'O':
+                        value += 10 ** count
+                        count = 0
+                        recordState = self.current_state[x+i][x]
                     else:
-                        recordState = self.current_state[i + x][x]
-                    count = 0
-        count = 0
-        recordState = '.'
+                        recordState = self.current_state[x+i][x]
+                if x == self.size - i - 1:
+                    recordState = '.'
+
 
         # left diagonal
         # upper half
+        recordState = '.'
+        count=0
         for i in range(0, self.size):
-            for x in range(0, i + 1):
-                if (self.current_state[i - x][x] == 'X' and recordState == 'X'):
+            for x in range(0, i+1):
+                if (self.current_state[i-x][x] == 'X' and recordState == 'X'):
                     recordState = 'X'
                     count += 1
-                elif (self.current_state[i - x][x] == 'O' and recordState == 'O'):
+                    if x == i:
+                        recordState = '.'
+                        value -= 10 ** count
+                        count = 0
+                elif (self.current_state[i-x][x] == 'O' and recordState == 'O'):
                     recordState = 'O'
                     count += 1
-                else:
-                    if recordState == 'X' and (self.current_state[i - x][x] != recordState or x == i):
-                        value -= 10 ** count
-                        if self.current_state[i - x][x] == 'O' or self.current_state[i - x][x] == '*':
-                            value += 10 ** count
-                        recordState = self.current_state[i - x][x]
-                    elif recordState == 'O' and (self.current_state[i - x][x] != recordState or x == i):
+                    if x == i:
+                        recordState = '.'
                         value += 10 ** count
-                        if self.current_state[i - x][x] == 'X' or self.current_state[i - x][x] == '*':
-                            value -= 10 ** count
-                        recordState = self.current_state[i - x][x]
+                        count = 0
+                else:
+                    if recordState == 'X':
+                        value -= 10 ** count
+                        count = 0
+                        recordState = self.current_state[i-x][x]
+                    elif recordState == 'O':
+                        value += 10 ** count
+                        count = 0
+                        recordState = self.current_state[i-x][x]
                     else:
-                        recordState = self.current_state[i - x][x]
-                    count = 0
-        count = 0
-        recordState = '.'
+                        recordState = self.current_state[i-x][x]
+                if x == i:
+                    recordState = '.'
+
         # lower half
-        for i in range(0, self.size):
-            for x in range(0, self.size - i):
+        recordState = '.'
+        count = 0
+        for i in range(1, self.size):
+            for x in range(0, self.size-i):
                 if (self.current_state[x + i][self.size - 1 - x] == 'X' and recordState == 'X'):
                     recordState = 'X'
                     count += 1
+                    if x == self.size-i-1:
+                        recordState = '.'
+                        value -= 10 ** count
+                        count = 0
                 elif (self.current_state[x + i][self.size - 1 - x] == 'O' and recordState == 'O'):
                     recordState = 'O'
                     count += 1
-                else:
-                    if recordState == 'X' and (self.current_state[x + i][self.size - 1 - x] != recordState or x == i):
-                        value -= 10 ** count
-                        if self.current_state[x + i][self.size - 1 - x] == 'O' or self.current_state[x + i][
-                            self.size - 1 - x] == '*':
-                            value += 10 ** count
-                        recordState = self.current_state[x + i][self.size - 1 - x]
-                    elif recordState == 'O' and (self.current_state[x + i][self.size - 1 - x] != recordState or x == i):
+                    if x == self.size-i-1:
+                        recordState = '.'
                         value += 10 ** count
-                        if self.current_state[x + i][self.size - 1 - x] == 'X' or self.current_state[x + i][
-                            self.size - 1 - x] == '*':
-                            value -= 10 ** count
+                        count = 0
+                else:
+                    if recordState == 'X':
+                        value -= 10 ** count
+                        count = 0
+                        recordState = self.current_state[x + i][self.size - 1 - x]
+                    elif recordState == 'O':
+                        value += 10 ** count
+                        count = 0
                         recordState = self.current_state[x + i][self.size - 1 - x]
                     else:
                         recordState = self.current_state[x + i][self.size - 1 - x]
-                    count = 0
-        end = time.time()
+                if  x==self.size-i-1:
+                    recordState = '.'
 
         return value
     def check_end(self):
@@ -256,7 +302,7 @@ class Test:
 def main():
     test=Test(recommend=True)
     print(test.e2())
-    print(-20**2)
+    print(sum(test.list))
 if __name__ == "__main__":
 	main()
 
