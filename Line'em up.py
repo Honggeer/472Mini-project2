@@ -680,7 +680,6 @@ class Game:
 
         while True:
             totalT=0
-            print(self.TimeBoard)
             print()
             self.steps+=1
             if self.check_end():
