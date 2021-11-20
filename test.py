@@ -1,12 +1,12 @@
 import  time
-testList=[['.','.','.','.','.'],
-          ['.','.','.','.','.'],
-          ['.','.','X','.','.'],
-          ['.','.','.','.','.'],
-          ['.','.','.','.','.']]
+testList=[['X','X','X','O','X'],
+          ['O','O','O','X','X'],
+          ['O','X','X','O','.'],
+          ['O','O','O','X','.'],
+          ['X','.','.','.','.']]
 class Test:
     size=5
-    winSize=5
+    winSize=4
     list=[1,2,3,4,5]
     def __init__(self, recommend=True):
         self.initialize_Test()
@@ -301,8 +301,11 @@ class Test:
         return self.result
 def main():
     test=Test(recommend=True)
-    print(test.e2())
+    print(test.is_end())
     print(sum(test.list))
+    charList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+    print(charList.index('A'))
+    print('A'  in charList)
 if __name__ == "__main__":
 	main()
 
